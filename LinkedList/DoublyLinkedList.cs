@@ -7,44 +7,46 @@ using System.Threading.Tasks;
 
 namespace LinkedList
 {
-    public class SinglyLinkedList<T> : ICollection<T>
+    public class DoublyLinkedList<T> : ICollection<T>
     {
         public LinkedListNode<T> Head { get; private set; }
-
         public LinkedListNode<T> Tail { get; private set; }
 
         public int Count { get; private set; }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+
+        public bool IsReadOnly { get { return true; } }
+
 
         public void Add(T item)
         {
-            LinkedListNode<T> node = new LinkedListNode<T>(item);
-            AddLast(node);
+            AddLast(item);
         }
 
-        public void AddFirst(LinkedListNode<T> node)
+        private void AddFirst(T item)
         {
+            LinkedListNode<T> node = new LinkedListNode<T>(item);
+
             LinkedListNode<T> temp = Head;
             Head = node;
             Head.Next = temp;
 
             if (Count == 0)
             {
-                Tail = node;
+                Tail = Head;
+            }
+            else
+            {
+                temp.Previous = Head;
             }
 
             Count++;
         }
 
-        private void AddLast(LinkedListNode<T> node)
+        private void AddLast(T item)
         {
+            LinkedListNode<T> node = new LinkedListNode<T>(item);
+
             if (Count == 0)
             {
                 Head = node;
@@ -52,11 +54,13 @@ namespace LinkedList
             else
             {
                 Tail.Next = node;
+                node.Previous = Tail;
             }
 
             Tail = node;
+
             Count++;
-        }
+        } 
 
         public void Clear()
         {
@@ -93,7 +97,6 @@ namespace LinkedList
             }
         }
 
-
         public bool Remove(T item)
         {
             LinkedListNode<T> previous = null;
@@ -107,14 +110,20 @@ namespace LinkedList
                     {
                         previous.Next = current.Next;
 
-                        if (previous.Next == null)
+                        if (current.Next == null)
                         {
                             Tail = previous;
                         }
+                        else
+                        {
+                            current.Next.Previous = previous;
+                        }
+
+                        Count--;
                     }
                     else
                     {
-                        RemoveFirst();
+                        RemoveFirst(); 
                     }
 
                     return true;
@@ -127,7 +136,7 @@ namespace LinkedList
             return false;
         }
 
-        public void RemoveFirst()
+        private void RemoveFirst()
         {
             if (Count != 0)
             {
@@ -138,11 +147,14 @@ namespace LinkedList
                 {
                     Tail = null;
                 }
+                else
+                {
+                    Head.Previous = null;
+                }
             }
-            
         }
 
-        public void RemoveLast()
+        private void RemoveLast()
         {
             if (Count != 0)
             {
@@ -153,15 +165,8 @@ namespace LinkedList
                 }
                 else
                 {
-                    LinkedListNode<T> current = Head;
-
-                    while (current != Tail)
-                    {
-                        current = current.Next;
-                    }
-
-                    current.Next = null;
-                    Tail = current;
+                    Tail.Previous.Next = null;
+                    Tail = Tail.Previous;
                 }
 
                 Count--;
