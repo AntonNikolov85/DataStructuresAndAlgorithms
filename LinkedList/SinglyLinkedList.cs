@@ -155,7 +155,7 @@ namespace LinkedList
                 {
                     LinkedListNode<T> current = Head;
 
-                    while (current != Tail)
+                    while (current.Next != Tail)
                     {
                         current = current.Next;
                     }
